@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:FishApp/main.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Edit extends StatefulWidget {
   final String name;
@@ -20,9 +22,12 @@ class _EditState extends State<Edit> {
   TextEditingController fprice;
   TextEditingController fweight;
   TextEditingController fdescription;
+  bool nameValidate = true;
+  bool weightValidate = true;
+  bool priceValidate = true;
 
   void editData() {
-    var url = "http://192.168.1.102/Fishapp_backend/Services/editFish.php";
+    var url = "http://172.18.208.1/Fishapp_backend/Services/editFish.php";
 
     http.post(url, body: {
       "id": fid.text,
@@ -46,6 +51,13 @@ class _EditState extends State<Edit> {
 
   @override
   Widget build(BuildContext context) {
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20), primary: Colors.white);
+    final TextStyle errorStyle = TextStyle(fontSize: 16.0, color: Colors.white);
+    final TextStyle inputStyle = TextStyle(color: Colors.teal[100], fontSize: 18, fontWeight: FontWeight.w500);
+    final TextStyle labelStyle = TextStyle(color: Colors.lightBlue[200], fontSize: 16);
+    final TextStyle hintStyle = TextStyle(color: Colors.lightBlue[400]);
+    final TextStyle  helperStyle = TextStyle(color: Colors.white);
+    
     return Scaffold(
       backgroundColor: Colors.blue[900],
       appBar: new AppBar(
@@ -65,86 +77,120 @@ class _EditState extends State<Edit> {
                     image: AssetImage('assets/logo.png'),
                   ),
                 ),
-                // new TextField(
-                //   controller: bid,
-                //   decoration: new InputDecoration(
-                //     hintText: "UID",
-                //     labelText: "UID",
-                //   ),
-                // ),
-                new TextField(
+                new TextFormField(
                   controller: fname,
-                  style: TextStyle(color: Colors.teal[100]),
+                  style: inputStyle,
                   decoration: new InputDecoration(
                       hoverColor: Colors.lightBlue[800],
-                      //border: OutlineInputBorder(),
                       hintText: "Name",
                       labelText: "NAME",
-                      labelStyle: TextStyle(color: Colors.lightBlue[200]),
-                      hintStyle: TextStyle(color: Colors.lightBlue[400]),
-                      helperStyle: TextStyle(color: Colors.white),
+                      labelStyle: labelStyle,
+                      hintStyle: hintStyle,
+                      helperStyle: helperStyle,
                       fillColor: Colors.lightBlue[800],
-                      filled: true),
+                      filled: true,
+                      errorText: (nameValidate == false) ? 'name cannot be empty': null,
+                      errorStyle: errorStyle,
+                      ),
+                      onChanged: (value)=> {
+                          setState((){
+                            nameValidate= value.isNotEmpty;
+                          })
+                      },
                 ),
                 SizedBox(height: 10),
-                new TextField(
+                new TextFormField(
                   controller: fprice,
-                  style: TextStyle(color: Colors.teal[100]),
+                  style: inputStyle,
                   decoration: new InputDecoration(
-                      // border: OutlineInputBorder(),
                       hintText: "Price",
-                      labelText: "PRICE",
+                      labelText: "PRICE (RS)",
                       hoverColor: Colors.lightBlue[800],
-                      labelStyle: TextStyle(color: Colors.lightBlue[200]),
-                      hintStyle: TextStyle(color: Colors.lightBlue[400]),
-                      helperStyle: TextStyle(color: Colors.white),
+                      labelStyle: labelStyle,
+                      hintStyle: hintStyle,
+                      helperStyle: helperStyle,
                       fillColor: Colors.lightBlue[800],
-                      filled: true),
+                      filled: true, 
+                      errorText: (priceValidate == false) ? 'price cannot be empty': null,
+                      errorStyle: errorStyle,
+                      ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                      onChanged: (value)=> {
+                          setState((){
+                            priceValidate= value.isNotEmpty;
+                          })
+                      },
+ 
                 ),
                 SizedBox(height: 10),
-                new TextField(
+                new TextFormField(
                   controller: fweight,
-                  style: TextStyle(color: Colors.teal[100]),
+                  style: inputStyle,
                   decoration: new InputDecoration(
-                      //border: OutlineInputBorder(),
                       hintText: "Weight",
-                      labelText: "WEIGHT",
+                      labelText: "WEIGHT (KG)",
                       hoverColor: Colors.lightBlue[800],
-                      labelStyle: TextStyle(color: Colors.lightBlue[200]),
-                      hintStyle: TextStyle(color: Colors.lightBlue[400]),
-                      helperStyle: TextStyle(color: Colors.white),
+                      labelStyle: labelStyle,
+                      hintStyle: hintStyle,
+                      helperStyle: helperStyle,
                       fillColor: Colors.lightBlue[800],
-                      filled: true),
+                      filled: true,
+                      errorText: (weightValidate == false) ? 'weight cannot be missing or empty': null,
+                      errorStyle: errorStyle,
+                      ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                      onChanged: (value)=> {
+                      
+                          setState((){
+                            weightValidate= value.isNotEmpty;
+                          })
+                     
+                      },
+
                 ),
                 SizedBox(height: 10),
                 new TextField(
-                  style: TextStyle(color: Colors.teal[100]),
+                  style: inputStyle,
                   maxLines: 3,
                   controller: fdescription,
                   decoration: new InputDecoration(
                       hintText: " Enter Description",
                       labelText: "DESCRIPTION",
-                      labelStyle: TextStyle(color: Colors.lightBlue[200]),
-                      hintStyle: TextStyle(color: Colors.lightBlue[400]),
-                      helperStyle: TextStyle(color: Colors.white),
+                      labelStyle: labelStyle,
+                      hintStyle: hintStyle,
+                      helperStyle: helperStyle,
                       fillColor: Colors.lightBlue[800],
                       filled: true),
                 ),
 
                 new Padding(padding: EdgeInsets.all(10.0)),
-                new RaisedButton(
-                  color: Colors.blueAccent,
+                new ElevatedButton(
+                  style: buttonStyle,
                   onPressed: () {
-                    editData();
-                    Navigator.of(context).push(
-                      new MaterialPageRoute(
-                        builder: (BuildContext context) => new Home(),
-                      ),
-                    );
+                    if (nameValidate && weightValidate && priceValidate){
+                      editData();
+                      Navigator.of(context).push(
+                        new MaterialPageRoute(
+                          builder: (BuildContext context) => new Home(),
+                        ),
+                      );
+                    }else{
+                      Fluttertoast.showToast(
+                        msg: "cannot be updated",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.white70,
+                        textColor: Colors.blue[400],
+                        fontSize: 16.0
+    );
+                    }
                   },
                   child: new Text(
                     "Update",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.blue[900], fontSize: 18),
                   ),
                 )
               ],
