@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:FishApp/main.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Edit extends StatefulWidget {
   final String name;
@@ -103,7 +104,7 @@ class _EditState extends State<Edit> {
                   style: inputStyle,
                   decoration: new InputDecoration(
                       hintText: "Price",
-                      labelText: "PRICE",
+                      labelText: "PRICE (RS)",
                       hoverColor: Colors.lightBlue[800],
                       labelStyle: labelStyle,
                       hintStyle: hintStyle,
@@ -128,7 +129,7 @@ class _EditState extends State<Edit> {
                   style: inputStyle,
                   decoration: new InputDecoration(
                       hintText: "Weight",
-                      labelText: "WEIGHT",
+                      labelText: "WEIGHT (KG)",
                       hoverColor: Colors.lightBlue[800],
                       labelStyle: labelStyle,
                       hintStyle: hintStyle,
@@ -175,11 +176,21 @@ class _EditState extends State<Edit> {
                           builder: (BuildContext context) => new Home(),
                         ),
                       );
+                    }else{
+                      Fluttertoast.showToast(
+                        msg: "cannot be updated",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.white70,
+                        textColor: Colors.blue[400],
+                        fontSize: 16.0
+    );
                     }
                   },
                   child: new Text(
                     "Update",
-                    style: TextStyle(color: Colors.blue[900], fontSize: 16),
+                    style: TextStyle(color: Colors.blue[900], fontSize: 18),
                   ),
                 )
               ],
