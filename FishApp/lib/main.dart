@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
     return fishFromJson(response.body);
   }
 
-  void deleteData(String _id) async {
+  Future deleteData(String _id) async {
     print(_id);
     var url = "http://192.168.1.102/Fishapp_backend/Services/deleteFish.php";
     print(_id);
@@ -34,45 +34,49 @@ class _HomeState extends State<Home> {
     print(res);
   }
 
-  void confirm(String id) {
-    print(id);
-    AlertDialog alertDialog = new AlertDialog(
-      content: Text("Are you sure you want to delete this item?"),
-      actions: <Widget>[
-        new RaisedButton(
-          child: Text(
-            "Delete",
-            style: new TextStyle(color: Colors.red),
-          ),
-          color: Colors.white,
-          onPressed: () {
-            deleteData(id);
-            Navigator.of(context).push(
-              new MaterialPageRoute(
-                builder: (BuildContext context) => new Home(),
+  Future confirmAndDetele(String id) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Text("Are you sure you want to delete this item?"),
+          actions: <Widget>[
+            new RaisedButton(
+              child: Text(
+                "Delete",
+                style: new TextStyle(color: Colors.red),
               ),
-            );
-          },
-        ),
-        new RaisedButton(
-          child: Text(
-            "Cancel",
-            style: new TextStyle(color: Colors.black),
-          ),
-          color: Colors.white,
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+              color: Colors.white,
+              onPressed: () {
+                deleteData(id).then((_) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(
+                    new MaterialPageRoute(
+                      builder: (BuildContext context) => new Home(),
+                    ),
+                  );
+                });
+              },
+            ),
+            new RaisedButton(
+              child: Text(
+                "Cancel",
+                style: new TextStyle(color: Colors.black),
+              ),
+              color: Colors.white,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
-
-    showDialog(context: context, child: alertDialog);
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Scaffold(
       backgroundColor: Colors.blue[900],
       appBar: new AppBar(
@@ -94,153 +98,147 @@ class _HomeState extends State<Home> {
           color: Colors.white,
         ),
       ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(),
-          child: new FutureBuilder<List>(
-            future: fetchFish(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data.length < 1) {
-                  return Center(
-                    child: Image(
-                      image: AssetImage("assets/fish.JPG"),
-                    ),
-                  );
-                } else
-                  return Column(children: <Widget>[
-                    Container(
-                      height: 200.0,
-                      width: 150.0,
-                      child: Image(
-                        image: AssetImage('assets/logo.png'),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: ListView.builder(
-                        itemCount: snapshot.data.length,
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, index) {
-                          Fish fish = snapshot.data[index];
-                          String id = "${fish.id}";
+      body: new FutureBuilder<List>(
+        future: fetchFish(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.length < 1) {
+              return Center(
+                child: Image(
+                  image: AssetImage("assets/fish.JPG"),
+                ),
+              );
+            } else
+              return ListView(children: <Widget>[
+                Container(
+                  height: 200.0,
+                  width: 150.0,
+                  child: Image(
+                    image: AssetImage('assets/logo.png'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: ListView.builder(
+                    itemCount: snapshot.data.length,
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, index) {
+                      Fish fish = snapshot.data[index];
+                      String id = "${fish.id}";
 
-                          var des = "${fish.description}";
-                          String fname = "${fish.name}";
-                          String fweight = "${fish.weight}";
-                          var fprice = "${fish.price}";
-                          return Column(children: <Widget>[
-                            // Divider(
-                            //   color: Colors.blue[900],
-                            //   thickness: 1.0,
-                            // ),
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.lightBlue[800],
-                                ),
-                                child: ListTile(
-                                  hoverColor: Colors.blueGrey[400],
-                                  title: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 4, 0, 10),
-                                    child: Text(
-                                      '${fish.name}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22.0,
-                                          letterSpacing: 1.0,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.0),
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        "Weight: ${fish.weight} KG",
-                                        style: TextStyle(
-                                          color: Colors.greenAccent,
-                                          fontSize: 18.0,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Price: ${fish.price} Rupees',
-                                        style: TextStyle(
-                                          color: Colors.blueGrey[100],
-                                          fontSize: 18.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  leading: new Icon(
-                                    Icons.directions_boat,
-                                    color: Colors.black,
-                                  ),
-                                  onTap: () => Navigator.of(context).push(
-                                    new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          new Description(
-                                              descripition: des,
-                                              name: fname,
-                                              price: fprice,
-                                              weight: fweight),
-                                    ),
-                                  ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.edit,
-                                          size: 20.0,
-                                          color: Colors.black,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).push(
-                                            new MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  new Edit(
-                                                      id: id,
-                                                      description: des,
-                                                      name: fname,
-                                                      price: fprice,
-                                                      weight: fweight),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.delete,
-                                          size: 20.0,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {
-                                          confirm(id);
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                      var des = "${fish.description}";
+                      String fname = "${fish.name}";
+                      String fweight = "${fish.weight}";
+                      var fprice = "${fish.price}";
+                      return Column(children: <Widget>[
+                        // Divider(
+                        //   color: Colors.blue[900],
+                        //   thickness: 1.0,
+                        // ),
+                        Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.lightBlue[800],
+                            ),
+                            child: ListTile(
+                              hoverColor: Colors.blueGrey[400],
+                              title: Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 4, 0, 10),
+                                child: Text(
+                                  '${fish.name}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22.0,
+                                      letterSpacing: 1.0,
+                                      fontWeight: FontWeight.bold,
+                                      height: 1.0),
                                 ),
                               ),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "Weight: ${fish.weight} KG",
+                                    style: TextStyle(
+                                      color: Colors.greenAccent,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Price: ${fish.price} Rupees',
+                                    style: TextStyle(
+                                      color: Colors.blueGrey[100],
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              leading: new Icon(
+                                Icons.directions_boat,
+                                color: Colors.black,
+                              ),
+                              onTap: () => Navigator.of(context).push(
+                                new MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      new Description(
+                                          descripition: des,
+                                          name: fname,
+                                          price: fprice,
+                                          weight: fweight),
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.edit,
+                                      size: 20.0,
+                                      color: Colors.black,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        new MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              new Edit(
+                                                  id: id,
+                                                  description: des,
+                                                  name: fname,
+                                                  price: fprice,
+                                                  weight: fweight),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      size: 20.0,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      confirmAndDetele(id);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(height: 5.0),
-                            // Divider(
-                            //   color: Colors.blue[900],
-                            //   thickness: 1.0,
-                            // )
-                          ]);
-                        },
-                      ),
-                    ),
-                  ]);
-              }
-              return CircularProgressIndicator();
-            },
-          ),
-        ),
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        // Divider(
+                        //   color: Colors.blue[900],
+                        //   thickness: 1.0,
+                        // )
+                      ]);
+                    },
+                  ),
+                ),
+              ]);
+          }
+          return Container(child: Center(child: CircularProgressIndicator()));
+        },
       ),
     );
   }
