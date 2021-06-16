@@ -52,7 +52,7 @@ class _EditState extends State<Edit> {
   Widget build(BuildContext context) {
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20), primary: Colors.white);
     final TextStyle errorStyle = TextStyle(fontSize: 16.0, color: Colors.white);
-    final TextStyle inputStyle = TextStyle(color: Colors.teal[100], fontSize: 18);
+    final TextStyle inputStyle = TextStyle(color: Colors.teal[100], fontSize: 18, fontWeight: FontWeight.w500);
     final TextStyle labelStyle = TextStyle(color: Colors.lightBlue[200], fontSize: 16);
     final TextStyle hintStyle = TextStyle(color: Colors.lightBlue[400]);
     final TextStyle  helperStyle = TextStyle(color: Colors.white);
